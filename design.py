@@ -29,7 +29,13 @@ class Ui_MainWindow(object):
         self.sqlQuery.setMaximumSize(QtCore.QSize(16777215, 100))
         self.sqlQuery.setObjectName("sqlQuery")
         self.verticalLayout.addWidget(self.sqlQuery)
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setObjectName("label")
+        self.verticalLayout.addWidget(self.label)
         self.executeButton = QtWidgets.QPushButton(self.centralwidget)
+        self.executeButton.setAutoFillBackground(False)
+        self.executeButton.setAutoDefault(False)
+        self.executeButton.setFlat(False)
         self.executeButton.setObjectName("executeButton")
         self.verticalLayout.addWidget(self.executeButton)
         self.resultLabel = QtWidgets.QLabel(self.centralwidget)
@@ -47,9 +53,10 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "DB connections"))
-        self.connectionLabel.setText(_translate("MainWindow", "sqlite3 connection string"))
+        self.connectionLabel.setText(_translate("MainWindow", "Database connection string - fill connection parameters to connect to database"))
         self.dbConnection.setPlaceholderText(_translate("MainWindow", ":memory:"))
-        self.sqlQueryLabel.setText(_translate("MainWindow", "SQL query"))
-        self.executeButton.setText(_translate("MainWindow", "Run"))
-        self.resultLabel.setText(_translate("MainWindow", "Result"))
+        self.sqlQueryLabel.setText(_translate("MainWindow", "SQL Statement:"))
+        self.label.setText(_translate("MainWindow", "Edit the SQL Statement, and click \"Run SQL\" to see the result."))
+        self.executeButton.setText(_translate("MainWindow", "Run SQL"))
+        self.resultLabel.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Result:</span></p></body></html>"))
 

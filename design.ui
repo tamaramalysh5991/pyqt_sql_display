@@ -18,7 +18,7 @@
     <item>
      <widget class="QLabel" name="connectionLabel">
       <property name="text">
-       <string>sqlite3 connection string</string>
+       <string>Database connection string - fill connection parameters to connect to database</string>
       </property>
      </widget>
     </item>
@@ -32,7 +32,7 @@
     <item>
      <widget class="QLabel" name="sqlQueryLabel">
       <property name="text">
-       <string>SQL query</string>
+       <string>SQL Statement:</string>
       </property>
      </widget>
     </item>
@@ -47,16 +47,32 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="executeButton">
+     <widget class="QLabel" name="label">
       <property name="text">
-       <string>Run</string>
+       <string>Edit the SQL Statement, and click &quot;Run SQL&quot; to see the result.</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="executeButton">
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Run SQL</string>
+      </property>
+      <property name="autoDefault">
+       <bool>false</bool>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
       </property>
      </widget>
     </item>
     <item>
      <widget class="QLabel" name="resultLabel">
       <property name="text">
-       <string>Result</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Result:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </item>
