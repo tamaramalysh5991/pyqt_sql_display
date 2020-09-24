@@ -10,7 +10,7 @@ from PyQt5 import QtWidgets
 def get_database(db_name: str) -> db_connection.AbstractDbConnection:
     """Get available database connection by name"""
     try:
-        return db_connection.DB_CONNECTIONS[db_name]
+        return db_connection.DB_CONNECTIONS[db_name]()
     except KeyError:
         raise DatabaseAppError(msg=f'Database with name {db_name} does not exist')
 
