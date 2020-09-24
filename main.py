@@ -26,6 +26,14 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         msg.setWindowTitle("Error")
         msg.exec_()
 
+    def show_info_message(self, info_msg):
+        """Show info message"""
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Information)
+        msg.setText(info_msg)
+        msg.setWindowTitle("Info")
+        msg.exec_()
+
     def execute_sql_query(self):
         try:
             # TODO: add other database support
@@ -38,7 +46,8 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
             data, columns = db.run(query=query, connection_params=connection)
             if not data:
-                data = [('You have made changes to the database.',), ]
+                self.show_info_message('You have made changes to the database.')
+                return
 
             model = table_model.TableModel(data=data, columns=columns)
             self.resultTable.setModel(model)
