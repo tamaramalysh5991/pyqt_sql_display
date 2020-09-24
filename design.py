@@ -31,6 +31,7 @@ class Ui_MainWindow(object):
         self.label_2.setObjectName("label_2")
         self.verticalLayout.addWidget(self.label_2)
         self.dbConnection = QtWidgets.QLineEdit(self.centralwidget)
+        self.dbConnection.setPlaceholderText("")
         self.dbConnection.setObjectName("dbConnection")
         self.verticalLayout.addWidget(self.dbConnection)
         self.sqlQueryLabel = QtWidgets.QLabel(self.centralwidget)
@@ -81,8 +82,9 @@ class Ui_MainWindow(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">Fill connection parameters to connect to database.</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">For Example:</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">For PostgreSQL : dbname=test user=postgres password=secret</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">For SQLite: db.sqlite</span></p></body></html>"))
-        self.dbConnection.setPlaceholderText(_translate("MainWindow", ":memory:"))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">For SQLite: db.sqlite (or :memory:*)</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">* :memory: means that you can create the SQLite database in RAM</span></p></body></html>"))
         self.sqlQueryLabel.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">SQL Statement:</span></p></body></html>"))
         self.label.setText(_translate("MainWindow", "Edit the SQL Statement, and click \"Run SQL\" to see the result."))
         self.executeButton.setText(_translate("MainWindow", "Run SQL"))

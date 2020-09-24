@@ -1,9 +1,10 @@
 import sys
-from PyQt5 import QtWidgets
+from exceptions import DatabaseAppError
+
+import db_connection
 import design
 import table_model
-from exceptions import DatabaseAppError
-import db_connection
+from PyQt5 import QtWidgets
 
 
 def get_database(db_name: str) -> db_connection.AbstractDbConnection:
@@ -15,10 +16,7 @@ def get_database(db_name: str) -> db_connection.AbstractDbConnection:
 
 
 class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
-    """This class define the database app"""
-
-    # default db connection
-    default_db = db_connection.SQLiteConnection
+    """A class to represent the database app"""
 
     def __init__(self):
         super().__init__()
@@ -27,7 +25,7 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.executeButton.clicked.connect(self.execute_sql_query)
 
     def show_error(self, error_msg: str):
-        """Show error message"""
+        """Prepared and display error message"""
         msg = QtWidgets.QMessageBox()
         msg.setIcon(QtWidgets.QMessageBox.Critical)
         msg.setText(error_msg)
@@ -35,7 +33,7 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         msg.exec_()
 
     def show_info_message(self, info_msg: str):
-        """Show info message"""
+        """Prepared and display info message"""
         msg = QtWidgets.QMessageBox()
         msg.setIcon(QtWidgets.QMessageBox.Information)
         msg.setText(info_msg)
@@ -59,7 +57,7 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 self.show_info_message('You have made changes to the database.')
                 return
 
-            model = table_model.TableModel(data=data, columns=columns)
+            model = table_model.SQLTableViewModel(data=data, columns=columns)
             self.resultTable.setModel(model)
             self.resultTable.resizeColumnsToContents()
         except DatabaseAppError as e:

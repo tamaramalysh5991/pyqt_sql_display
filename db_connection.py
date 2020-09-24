@@ -1,11 +1,11 @@
 import sqlite3
 from abc import ABC
-import psycopg2
-
 from exceptions import DatabaseAppError
 
+import psycopg2
+
 DEFAULT_SQLITE_CONNECTION = ':memory:'
-# define in memory connection for SQLite
+# define `in memory` connection for SQLite
 in_memory_sqlite_connection = sqlite3.connect(DEFAULT_SQLITE_CONNECTION)
 
 
@@ -21,6 +21,11 @@ class SQLiteConnection(AbstractDbConnection):
     """Connection for SQLite"""
 
     def run(self, query: str, connection_params: str = None) -> tuple:
+        """Connect to SQLite db and execute sql command
+        If connection params weren't provided, we use `in-memory` connection to create database in RAM
+        More info:
+        https://docs.python.org/3/library/sqlite3.html#module-sqlite3
+        """
         try:
 
             conn = sqlite3.connect(connection_params) if connection_params else in_memory_sqlite_connection
