@@ -1,4 +1,6 @@
 import sqlite3
+from abc import ABC
+import psycopg2
 
 from exceptions import DatabaseAppError
 
@@ -7,10 +9,10 @@ DEFAULT_SQLITE_CONNECTION = ':memory:'
 in_memory_sqlite_connection = sqlite3.connect(DEFAULT_SQLITE_CONNECTION)
 
 
-class AbstractDbConnection:
+class AbstractDbConnection(ABC):
     """Abstract class for connect to Database and Execute SQL commands"""
 
-    def run(self, query: str, connection_params=None):
+    def run(self, query: str, connection_params: str = None):
         """Connect and execute SQL query"""
         raise NotImplementedError()
 
@@ -18,7 +20,7 @@ class AbstractDbConnection:
 class SQLiteConnection(AbstractDbConnection):
     """Connection for SQLite"""
 
-    def run(self, query: str, connection_params=None, ) -> tuple:
+    def run(self, query: str, connection_params: str = None) -> tuple:
         try:
 
             conn = sqlite3.connect(connection_params) if connection_params else in_memory_sqlite_connection
@@ -35,6 +37,33 @@ class SQLiteConnection(AbstractDbConnection):
             raise DatabaseAppError(msg=e.args[0])
 
 
+class PostgreSQLConnection(AbstractDbConnection):
+    """Connection to PostgreSQL"""
+
+    def run(self, query: str, connection_params: str = None):
+        try:
+            conn = psycopg2.connect(connection_params)
+            cursor = conn.cursor()
+            cursor.execute(query)
+            conn.commit()
+            data = cursor.fetchall()
+
+            columns = []
+            if cursor.description:
+                columns = [desc[0] for desc in cursor.description]
+
+            return data, columns
+        except psycopg2.DatabaseError as e:
+            cursor.close()
+            conn.close()
+            raise DatabaseAppError(msg=e.args[0])
+        finally:
+            cursor.close()
+            conn.close()
+
+
+# available app databases
 DB_CONNECTIONS = {
-    'sqlite': SQLiteConnection
+    'sqlite': SQLiteConnection,
+    'postgresql': PostgreSQLConnection,
 }
