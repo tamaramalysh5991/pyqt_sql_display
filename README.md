@@ -3,7 +3,12 @@
 ### Requirements
 Python version - 3.6.9
 
-Install requirements:
+Need to create virtual environment
+```bash
+python3 -m venv env
+```
+
+And then install requirements:
 ```bash
 pip install -r requirements.txt
 ```
