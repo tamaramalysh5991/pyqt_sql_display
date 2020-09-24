@@ -44,6 +44,15 @@
         <height>100</height>
        </size>
       </property>
+      <property name="inputMethodHints">
+       <set>Qt::ImhMultiLine</set>
+      </property>
+      <property name="autoFormatting">
+       <set>QTextEdit::AutoAll</set>
+      </property>
+      <property name="acceptRichText">
+       <bool>false</bool>
+      </property>
      </widget>
     </item>
     <item>
