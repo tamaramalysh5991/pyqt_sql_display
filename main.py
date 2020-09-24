@@ -6,6 +6,14 @@ from exceptions import DatabaseAppError
 import db_connection
 
 
+def get_database(db_name: str) -> db_connection.AbstractDbConnection:
+    """Get available database connection by name"""
+    try:
+        return db_connection.DB_CONNECTIONS.get[db_name]
+    except KeyError:
+        raise DatabaseAppError(msg=f'Database with name {db_name} does not exist')
+
+
 class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
     """This class define the database app"""
 
@@ -18,7 +26,7 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         # bound button with executing of SQL query
         self.executeButton.clicked.connect(self.execute_sql_query)
 
-    def show_error(self, error_msg):
+    def show_error(self, error_msg: str):
         """Show error message"""
         msg = QtWidgets.QMessageBox()
         msg.setIcon(QtWidgets.QMessageBox.Critical)
@@ -26,7 +34,7 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         msg.setWindowTitle("Error")
         msg.exec_()
 
-    def show_info_message(self, info_msg):
+    def show_info_message(self, info_msg: str):
         """Show info message"""
         msg = QtWidgets.QMessageBox()
         msg.setIcon(QtWidgets.QMessageBox.Information)
@@ -35,17 +43,19 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         msg.exec_()
 
     def execute_sql_query(self):
+        """Get connection param, database name and SQL query from forms and return SQL data"""
         try:
-            # TODO: add other database support
-            db = self.default_db()
-            connection = self.dbConnection.text().strip()
+            db_name = str(self.selectDatabase.currentText()).lower()
+            db = get_database(db_name=db_name)
+
             query = self.sqlQuery.toPlainText().strip()
             if not query:
                 self.show_error(error_msg='Please, edit the SQL Statement')
                 return
 
+            connection = self.dbConnection.text().strip()
             data, columns = db.run(query=query, connection_params=connection)
-            if not data:
+            if not data and not columns:
                 self.show_info_message('You have made changes to the database.')
                 return
 
