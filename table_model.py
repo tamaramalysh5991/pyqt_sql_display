@@ -31,17 +31,15 @@ class SQLTableViewModel(QtCore.QAbstractTableModel):
             # Default (anything not captured above: e.g. int)
             return value
 
-    def rowCount(self, index):
+    def rowCount(self, index) -> int:
         """Return the length of the outer list."""
         return len(self._data)
 
-    def columnCount(self, index):
+    def columnCount(self, index) -> int:
         """The following takes the first sub-list, and returns
         the length (only works if all rows are an equal length)
         """
-        if not self._data:
-            return 0
-        return len(self._data[0])
+        return len(self._columns)
 
     def headerData(self, section, orientation, role):
         """Set headers in table if they was provided"""
