@@ -52,14 +52,14 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 return
 
             connection = self.dbConnection.text().strip()
-            data, columns = db.run(query=query, connection_params=connection)
-            if not data and not columns:
-                self.show_info_message('You have made changes to the database.')
+            data, columns, rows_affected = db.run(query=query, connection_params=connection)
+            if not columns:
+                rows_affected_msg = f' Rows affected: {rows_affected}' if rows_affected > 0 else ''
+                self.show_info_message(f'You have made changes to the database.{rows_affected_msg}')
                 return
 
             model = table_model.SQLTableViewModel(data=data, columns=columns)
             self.resultTable.setModel(model)
-            self.resultTable.resizeColumnsToContents()
         except DatabaseAppError as e:
             self.show_error(error_msg=e.msg)
 
