@@ -1,7 +1,7 @@
 import sqlite3
+import os
 from abc import ABC
 from exceptions import DatabaseAppError
-
 import psycopg2
 
 DEFAULT_SQLITE_CONNECTION = ':memory:'
@@ -17,56 +17,62 @@ class AbstractDbConnection(ABC):
         raise NotImplementedError()
 
 
-class SQLiteConnection(AbstractDbConnection):
-    """Connection for SQLite"""
+class AbstractDBAPIDbConnection(AbstractDbConnection):
+    """Class for Relation Database
+    Need to encapsulate the general logic for Databases by  Python Database API Specification 2.0
+    https://www.python.org/dev/peps/pep-0249/
+
+    """
+    client = None
+    default_connection = in_memory_sqlite_connection
+
+    def get_connection(self, connection_params: str = None):
+        return self.client.connect(connection_params) if connection_params else in_memory_sqlite_connection
 
     def run(self, query: str, connection_params: str = None) -> tuple:
-        """Connect to SQLite db and execute sql command
-        If connection params weren't provided, we use `in-memory` connection to create database in RAM
-        More info:
-        https://docs.python.org/3/library/sqlite3.html#module-sqlite3
-        """
-        conn = None
+        """Execute SQL command and return result"""
         try:
+            with self.get_connection(connection_params=connection_params) as conn:
+                conn = self.get_connection(connection_params=connection_params)
+                cursor = conn.cursor()
+                cursor.execute(query)
+                conn.commit()
 
-            conn = sqlite3.connect(connection_params) if connection_params else in_memory_sqlite_connection
-            cursor = conn.execute(query)
-            data = cursor.fetchall()
+                data = []
+                columns = []
 
-            columns = []
-            if cursor.description:
-                columns = [description[0] for description in cursor.description]
+                # if description is empty it means that operations that do not return rows
+                if cursor.description:
+                    data = cursor.fetchall()
+                    columns = [description[0] for description in cursor.description]
 
-            return data, columns
-        except sqlite3.DatabaseError as e:
-            if conn:
-                conn.close()
+                cursor.close()
+                return data, columns, cursor.rowcount
+        except (sqlite3.DatabaseError, psycopg2.DatabaseError) as e:
             raise DatabaseAppError(msg=e.args[0])
 
 
-class PostgreSQLConnection(AbstractDbConnection):
-    """Connection to PostgreSQL"""
+class SQLiteConnection(AbstractDBAPIDbConnection):
+    """Connection for SQLite"""
 
-    def run(self, query: str, connection_params: str = None):
-        try:
-            conn = psycopg2.connect(connection_params)
-            cursor = conn.cursor()
-            cursor.execute(query)
-            conn.commit()
-            data = cursor.fetchall()
+    client = sqlite3
+    default_connection = in_memory_sqlite_connection
 
-            columns = []
-            if cursor.description:
-                columns = [desc[0] for desc in cursor.description]
+    def get_connection(self, connection_params: str = None):
+        """In default SQLite create the file if it wasn't exist, but we block the file creation to consistent
+        (For example, PostgreSQL client don't allow it)"""
+        if not connection_params or connection_params == DEFAULT_SQLITE_CONNECTION:
+            return super().get_connection()
+        if not os.path.exists(connection_params):
+            raise DatabaseAppError(msg=f"Error! file with name {connection_params} does not exist")
+        return super().get_connection()
 
-            return data, columns
-        except psycopg2.DatabaseError as e:
-            cursor.close()
-            conn.close()
-            raise DatabaseAppError(msg=e.args[0])
-        finally:
-            cursor.close()
-            conn.close()
+
+class PostgreSQLConnection(AbstractDBAPIDbConnection):
+    """Db Connection to PostgreSQL"""
+
+    client = psycopg2
+    default_connection = ''
 
 
 # available app databases
