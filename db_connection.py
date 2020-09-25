@@ -24,10 +24,13 @@ class AbstractDBAPIDbConnection(AbstractDbConnection):
 
     """
     client = None
-    default_connection = in_memory_sqlite_connection
+    default_connection = None
+    # need to avoid freezing if query contains over 100000 rows
+    # TODO: need to implement the correct pagination
+    query_limit = 100000
 
     def get_connection(self, connection_params: str = None):
-        return self.client.connect(connection_params) if connection_params else in_memory_sqlite_connection
+        return self.client.connect(connection_params) if connection_params else self.default_connection
 
     def run(self, query: str, connection_params: str = None) -> tuple:
         """Execute SQL command and return result"""
@@ -42,7 +45,7 @@ class AbstractDBAPIDbConnection(AbstractDbConnection):
 
                 # if description is empty it means that operations that do not return rows
                 if cursor.description:
-                    data = cursor.fetchall()
+                    data = cursor.fetchmany(self.query_limit)
                     columns = [description[0] for description in cursor.description]
 
                 cursor.close()
