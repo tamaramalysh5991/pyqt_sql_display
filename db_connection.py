@@ -33,7 +33,6 @@ class AbstractDBAPIDbConnection(AbstractDbConnection):
         """Execute SQL command and return result"""
         try:
             with self.get_connection(connection_params=connection_params) as conn:
-                conn = self.get_connection(connection_params=connection_params)
                 cursor = conn.cursor()
                 cursor.execute(query)
                 conn.commit()
@@ -62,10 +61,10 @@ class SQLiteConnection(AbstractDBAPIDbConnection):
         """In default SQLite create the file if it wasn't exist, but we block the file creation to consistent
         (For example, PostgreSQL client don't allow it)"""
         if not connection_params or connection_params == DEFAULT_SQLITE_CONNECTION:
-            return super().get_connection()
+            return super().get_connection(connection_params)
         if not os.path.exists(connection_params):
             raise DatabaseAppError(msg=f"Error! file with name {connection_params} does not exist")
-        return super().get_connection()
+        return super().get_connection(connection_params)
 
 
 class PostgreSQLConnection(AbstractDBAPIDbConnection):
