@@ -26,6 +26,7 @@ class SQLiteConnection(AbstractDbConnection):
         More info:
         https://docs.python.org/3/library/sqlite3.html#module-sqlite3
         """
+        conn = None
         try:
 
             conn = sqlite3.connect(connection_params) if connection_params else in_memory_sqlite_connection
@@ -38,7 +39,8 @@ class SQLiteConnection(AbstractDbConnection):
 
             return data, columns
         except sqlite3.DatabaseError as e:
-            conn.close()
+            if conn:
+                conn.close()
             raise DatabaseAppError(msg=e.args[0])
 
 
