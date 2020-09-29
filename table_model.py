@@ -5,11 +5,11 @@ from PyQt5.QtCore import Qt
 
 
 class SQLTableViewModel(QtCore.QAbstractTableModel):
-    """Define custom model for `QTableView` to display SQL query results
+    """Define custom model for `QTableView` to display SQL query result
+    in QTableView element
     More info:
     https://doc.qt.io/qtforpython/PySide2/QtCore/QAbstractTableModel.html
     """
-
     def __init__(self, data, columns=None):
         super(SQLTableViewModel, self).__init__()
         self._data = data

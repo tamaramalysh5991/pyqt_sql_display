@@ -40,26 +40,43 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         msg.setWindowTitle("Info")
         msg.exec_()
 
+    def set_data_to_table_view(self, data, columns):
+        """Build model for QTableview and pass data to show"""
+        model = table_model.SQLTableViewModel(data=data, columns=columns)
+        self.resultTable.setModel(model)
+
+    def get_sql_query(self):
+        """Retrieve sql query from `QTextEdit` and check that query was provided"""
+        query = self.sqlQuery.toPlainText().strip()
+        if not query:
+            raise DatabaseAppError(msg='Please, edit the SQL Statement')
+        return query
+
+    def retrieve_db_client_by_selected_database(self):
+        """Define db client by selected database name"""
+        db_name = str(self.selectDatabase.currentText()).lower()
+        return get_database(db_name=db_name)
+
+    def get_db_connection_string(self):
+        """Retrieve connection string from `QLineEdit`"""
+        return self.dbConnection.text().strip()
+
     def execute_sql_query(self):
-        """Get connection param, database name and SQL query from forms and return SQL data"""
+        """Get connection param, database name and SQL query from forms and return SQL data
+        If it was DML statements, show info message about affected rows
+        """
         try:
-            db_name = str(self.selectDatabase.currentText()).lower()
-            db = get_database(db_name=db_name)
-
-            query = self.sqlQuery.toPlainText().strip()
-            if not query:
-                self.show_error(error_msg='Please, edit the SQL Statement')
-                return
-
-            connection = self.dbConnection.text().strip()
-            data, columns, rows_affected = db.run(query=query, connection_params=connection)
-            if not columns:
-                rows_affected_msg = f' Rows affected: {rows_affected}' if rows_affected > 0 else ''
+            db = self.retrieve_db_client_by_selected_database()
+            query = self.get_sql_query()
+            connection = self.get_db_connection_string()
+            db_result = db.run(query=query, connection_params=connection)
+            # if columns was not provided it means that operations do not return affected rows
+            if not db_result.columns:
+                rows_affected_msg = f' Rows affected: {db_result.rows_affected}' if db_result.rows_affected > 0 else ''
                 self.show_info_message(f'You have made changes to the database.{rows_affected_msg}')
                 return
 
-            model = table_model.SQLTableViewModel(data=data, columns=columns)
-            self.resultTable.setModel(model)
+            self.set_data_to_table_view(data=db_result.data, columns=db_result.columns)
         except DatabaseAppError as e:
             self.show_error(error_msg=e.msg)
 
