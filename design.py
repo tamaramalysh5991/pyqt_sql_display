@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(590, 776)
+        MainWindow.resize(623, 819)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -50,6 +50,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.label)
         self.executeButton = QtWidgets.QPushButton(self.centralwidget)
         self.executeButton.setAutoFillBackground(False)
+        self.executeButton.setCheckable(False)
         self.executeButton.setAutoDefault(True)
         self.executeButton.setDefault(False)
         self.executeButton.setFlat(False)
