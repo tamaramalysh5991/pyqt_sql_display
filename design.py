@@ -8,7 +8,6 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -51,7 +50,8 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.label)
         self.executeButton = QtWidgets.QPushButton(self.centralwidget)
         self.executeButton.setAutoFillBackground(False)
-        self.executeButton.setAutoDefault(False)
+        self.executeButton.setAutoDefault(True)
+        self.executeButton.setDefault(False)
         self.executeButton.setFlat(False)
         self.executeButton.setObjectName("executeButton")
         self.verticalLayout.addWidget(self.executeButton)
@@ -59,7 +59,7 @@ class Ui_MainWindow(object):
         self.resultLabel.setObjectName("resultLabel")
         self.verticalLayout.addWidget(self.resultLabel)
         self.resultTable = QtWidgets.QTableView(self.centralwidget)
-        self.resultTable.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContentsOnFirstShow)
+        self.resultTable.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
         self.resultTable.setObjectName("resultTable")
         self.verticalLayout.addWidget(self.resultTable)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -92,3 +92,4 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "Edit the SQL Statement, and click \"Run SQL\" to see the result."))
         self.executeButton.setText(_translate("MainWindow", "Run SQL"))
         self.resultLabel.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Result:</span></p></body></html>"))
+
