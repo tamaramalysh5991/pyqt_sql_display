@@ -2,6 +2,7 @@ from datetime import datetime
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
+from exceptions import DatabaseAppError
 
 
 class SQLTableViewModel(QtCore.QAbstractTableModel):
@@ -10,10 +11,25 @@ class SQLTableViewModel(QtCore.QAbstractTableModel):
     More info:
     https://doc.qt.io/qtforpython/PySide2/QtCore/QAbstractTableModel.html
     """
+
+    default_limit = 1000
+
     def __init__(self, data, columns=None):
-        super(SQLTableViewModel, self).__init__()
-        self._data = data
+        super().__init__()
+        self.cursor = data
+        first_batch = self.cursor.fetchmany(self.default_limit)
+        self._data = first_batch
         self._columns = columns
+
+    def add_more_data(self):
+        """Load more rows to `_data` from db cursor
+        The cursor is keeping track of where we are in the series of results, and we need to do is call
+        fetchmany() again until that produces an empty result
+        """
+        batch = self.cursor.fetchmany(self.default_limit)
+        if not batch:
+            raise DatabaseAppError(msg='All data was downloaded')
+        self._data = self._data + batch
 
     def data(self, index, role):
         """Format data if need"""

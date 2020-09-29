@@ -23,6 +23,12 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.setupUi(self)
         # bound button with executing of SQL query
         self.executeButton.clicked.connect(self.execute_sql_query)
+        self.resultTable.verticalScrollBar().valueChanged.connect(self.scrolled)
+
+    def scrolled(self, value):
+        """If user `scrolled to end`, we try to load more data from database cursor"""
+        if value == self.resultTable.verticalScrollBar().maximum():
+            self.load_next_chunk_of_db_data()
 
     def show_error(self, error_msg: str):
         """Prepared and display error message"""
@@ -44,6 +50,10 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         """Build model for QTableview and pass data to show"""
         model = table_model.SQLTableViewModel(data=data, columns=columns)
         self.resultTable.setModel(model)
+        # set column width to fit contents
+        self.resultTable.resizeColumnsToContents()
+        # set row height
+        self.resultTable.resizeRowsToContents()
 
     def get_sql_query(self):
         """Retrieve sql query from `QTextEdit` and check that query was provided"""
@@ -61,6 +71,17 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         """Retrieve connection string from `QLineEdit`"""
         return self.dbConnection.text().strip()
 
+    def load_next_chunk_of_db_data(self):
+        """Try to load the next chunk of data from table model if we have a next chunk
+        If all data were already downloaded, we do nothing
+        """
+        model = self.resultTable.model()
+        try:
+            model.add_more_data()
+            model.layoutChanged.emit()
+        except DatabaseAppError:
+            return
+
     def execute_sql_query(self):
         """Get connection param, database name and SQL query from forms and return SQL data
         If it was DML statements, show info message about affected rows
@@ -72,7 +93,7 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             db_result = db.run(query=query, connection_params=connection)
             # if columns was not provided it means that operations do not return affected rows
             if not db_result.columns:
-                rows_affected_msg = f' Rows affected: {db_result.rows_affected}' if db_result.rows_affected > 0 else ''
+                rows_affected_msg = f' Rows affected: {db_result.affected_rows}' if db_result.affected_rows > 0 else ''
                 self.show_info_message(f'You have made changes to the database.{rows_affected_msg}')
                 return
 

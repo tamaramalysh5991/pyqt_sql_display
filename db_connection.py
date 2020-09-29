@@ -30,9 +30,6 @@ class AbstractDBAPIDbConnection(AbstractDbConnection):
     """
     client = None
     default_connection = None
-    # need to avoid freezing
-    # TODO: need to implement the better solution
-    query_limit = 100000
 
     def get_connection(self, connection_params: str = None):
         """Try to connect to db via passed param or by default params"""
@@ -46,16 +43,13 @@ class AbstractDBAPIDbConnection(AbstractDbConnection):
                 cursor.execute(query)
                 conn.commit()
 
-                data = []
                 columns = []
 
                 # if description is empty it means that operations do not return affected rows
                 if cursor.description:
-                    data = cursor.fetchmany(self.query_limit)
                     columns = [description[0] for description in cursor.description]
 
-                cursor.close()
-                return DBResults(data=data, columns=columns, affected_rows=cursor.rowcount)
+                return DBResults(data=cursor, columns=columns, affected_rows=cursor.rowcount)
         except (sqlite3.DatabaseError, psycopg2.DatabaseError) as e:
             raise DatabaseAppError(msg=e.args[0])
 
