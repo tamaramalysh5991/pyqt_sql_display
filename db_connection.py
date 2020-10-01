@@ -5,7 +5,8 @@ from exceptions import DatabaseAppError
 import psycopg2
 from collections import namedtuple
 
-# need to keep result of DB query and data about columns and number of rows that the .execute() produced
+# need to keep result of DB query and data about columns
+# and number of rows that the .execute() produced
 DBResults = namedtuple('DBResults', 'data columns affected_rows')
 
 # sqlite connection string for `in memory` connection
@@ -24,7 +25,8 @@ class AbstractDbConnection(ABC):
 
 class AbstractDBAPIDbConnection(AbstractDbConnection):
     """Class for Relation Database
-    Need to encapsulate the general logic for Databases by  Python Database API Specification 2.0
+    Need to encapsulate the general logic for Databases by  Python
+    Database API Specification 2.0
     https://www.python.org/dev/peps/pep-0249/
 
     """
@@ -33,23 +35,34 @@ class AbstractDBAPIDbConnection(AbstractDbConnection):
 
     def get_connection(self, connection_params: str = None):
         """Try to connect to db via passed param or by default params"""
-        return self.client.connect(connection_params) if connection_params else self.default_connection
+        return self.client.connect(
+            connection_params
+        ) if connection_params else self.default_connection
 
     def run(self, query: str, connection_params: str = None) -> tuple:
         """Execute SQL command and return result"""
         try:
-            with self.get_connection(connection_params=connection_params) as conn:
+            with self.get_connection(
+                    connection_params=connection_params) as conn:
                 cursor = conn.cursor()
                 cursor.execute(query)
                 conn.commit()
 
                 columns = []
 
-                # if description is empty it means that operations do not return affected rows
+                # if description is empty it means that
+                # operations do not return affected rows
                 if cursor.description:
-                    columns = [description[0] for description in cursor.description]
+                    columns = [
+                        description[0] for description in
+                        cursor.description
+                    ]
 
-                return DBResults(data=cursor, columns=columns, affected_rows=cursor.rowcount)
+                return DBResults(
+                    data=cursor,
+                    columns=columns,
+                    affected_rows=cursor.rowcount
+                )
         except (sqlite3.DatabaseError, psycopg2.DatabaseError) as e:
             raise DatabaseAppError(msg=e.args[0])
 
@@ -61,13 +74,16 @@ class SQLiteConnection(AbstractDBAPIDbConnection):
     default_connection = in_memory_sqlite_connection
 
     def get_connection(self, connection_params: str = None):
-        """In default SQLite create the file if it wasn't exist, but we block the file creation to consistent with
-        other databases
-        (For example, PostgreSQL client don't allow it)"""
-        if not connection_params or connection_params == DEFAULT_SQLITE_CONNECTION:
+        """In default SQLite create the file if it wasn't exist,
+        but we block the file creation to consistent with
+        other databases. (For example, PostgreSQL client don't allow it)"""
+        if not connection_params or \
+                connection_params == DEFAULT_SQLITE_CONNECTION:
             return super().get_connection(connection_params)
         if not os.path.exists(connection_params):
-            raise DatabaseAppError(msg=f"Error! file with name {connection_params} does not exist")
+            raise DatabaseAppError(
+                msg=f"Error! file with name {connection_params} does not exist"
+            )
         return super().get_connection(connection_params)
 
 

@@ -23,7 +23,8 @@ class SQLTableViewModel(QtCore.QAbstractTableModel):
 
     def add_more_data(self):
         """Load more rows to `_data` from db cursor
-        The cursor is keeping track of where we are in the series of results, and we need to do is call
+        The cursor is keeping track of where we are in the series of results,
+        and we need to do is call
         fetchmany() again until that produces an empty result
         """
         batch = self.cursor.fetchmany(self.default_limit)

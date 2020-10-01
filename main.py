@@ -12,7 +12,8 @@ def get_database(db_name: str) -> db_connection.AbstractDbConnection:
     try:
         return db_connection.DB_CONNECTIONS[db_name]()
     except KeyError:
-        raise DatabaseAppError(msg=f'Database with name {db_name} does not exist')
+        raise DatabaseAppError(
+            msg=f'Database with name {db_name} does not exist')
 
 
 class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
@@ -23,10 +24,12 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.setupUi(self)
         # bound button with executing of SQL query
         self.executeButton.clicked.connect(self.execute_sql_query)
-        self.resultTable.verticalScrollBar().valueChanged.connect(self.scrolled)
+        self.resultTable.verticalScrollBar().valueChanged.connect(
+            self.scrolled)
 
     def scrolled(self, value):
-        """If user `scrolled to end`, we try to load more data from database cursor"""
+        """If user `scrolled to end`, we try
+        to load more data from database cursor"""
         if value == self.resultTable.verticalScrollBar().maximum():
             self.load_next_chunk_of_db_data()
 
@@ -56,7 +59,8 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.resultTable.resizeRowsToContents()
 
     def get_sql_query(self):
-        """Retrieve sql query from `QTextEdit` and check that query was provided"""
+        """Retrieve sql query from `QTextEdit`
+        and check that query was provided"""
         query = self.sqlQuery.toPlainText().strip()
         if not query:
             raise DatabaseAppError(msg='Please, edit the SQL Statement')
@@ -72,7 +76,8 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         return self.dbConnection.text().strip()
 
     def load_next_chunk_of_db_data(self):
-        """Try to load the next chunk of data from table model if we have a next chunk
+        """Try to load the next chunk of data from table
+        model if we have a next chunk
         If all data were already downloaded, we do nothing
         """
         model = self.resultTable.model()
@@ -83,7 +88,8 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             return
 
     def execute_sql_query(self):
-        """Get connection param, database name and SQL query from forms and return SQL data
+        """Get connection param, database name and SQL query from forms and
+        return SQL data
         If it was DML statements, show info message about affected rows
         """
         try:
@@ -91,13 +97,21 @@ class DatabaseApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             query = self.get_sql_query()
             connection = self.get_db_connection_string()
             db_result = db.run(query=query, connection_params=connection)
-            # if columns was not provided it means that operations do not return affected rows
+            # if columns was not provided it means that operations do not
+            # return affected rows
             if not db_result.columns:
-                rows_affected_msg = f' Rows affected: {db_result.affected_rows}' if db_result.affected_rows > 0 else ''
-                self.show_info_message(f'You have made changes to the database.{rows_affected_msg}')
+                rows_affected_msg = (
+                    f' Rows affected: {db_result.affected_rows}'
+                    if db_result.affected_rows > 0 else ''
+                )
+                self.show_info_message(
+                    f'You have made '
+                    f'changes to the database.{rows_affected_msg}'
+                )
                 return
 
-            self.set_data_to_table_view(data=db_result.data, columns=db_result.columns)
+            self.set_data_to_table_view(data=db_result.data,
+                                        columns=db_result.columns)
         except DatabaseAppError as e:
             self.show_error(error_msg=e.msg)
 
@@ -110,5 +124,6 @@ def main():
     app.exec()
 
 
-if __name__ == '__main__':  # if we're running file directly and not importing it
+if __name__ == '__main__':
+    # if we're running file directly and not importing it
     main()  # run the main function
