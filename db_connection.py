@@ -57,6 +57,8 @@ class AbstractDBAPIDbConnection(AbstractDbConnection):
                         description[0] for description in
                         cursor.description
                     ]
+                else:
+                    cursor.close()
 
                 return DBResults(
                     data=cursor,
@@ -77,13 +79,11 @@ class SQLiteConnection(AbstractDBAPIDbConnection):
         """In default SQLite create the file if it wasn't exist,
         but we block the file creation to consistent with
         other databases. (For example, PostgreSQL client don't allow it)"""
-        if not connection_params or \
-                connection_params == DEFAULT_SQLITE_CONNECTION:
-            return super().get_connection(connection_params)
-        if not os.path.exists(connection_params):
-            raise DatabaseAppError(
-                msg=f"Error! file with name {connection_params} does not exist"
-            )
+
+        if connection_params:
+            connection_params = f'file:{connection_params}' \
+                                f'?mode=rw&cache=shared'
+            return self.client.connect(connection_params, uri=True)
         return super().get_connection(connection_params)
 
 
